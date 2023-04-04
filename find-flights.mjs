@@ -18,11 +18,6 @@ const topRight = [home[0] + BOX_VARIANCE, home[1] + BOX_VARIANCE];
 // set the api key as the default parameter given to all api calls
 const searchParams = new URLSearchParams({ api_key: process.env.API_KEY, bbox: [...bottomLeft, ...topRight] });
 
-console.log('searchParams', searchParams.toString());
-console.log('home', home);
-
-
-
 const airLabsApi = axios.create({
   baseURL: 'https://airlabs.co/api/v9',
   transformResponse: (data) => {
@@ -48,8 +43,6 @@ const logFlyover = async () => {
       // also reducing the flight path to intercept relative zero
       const relativeHomeLat = home[0] - flight.lat;
       const relativeHomeLon = home[1] - flight.lng;
-      console.log(relativeHomeLat);
-      console.log(relativeHomeLon);
       const numerator = Math.abs((slope * relativeHomeLon) - relativeHomeLat);
       const denominator = Math.sqrt((slope * slope) + 1);
 
