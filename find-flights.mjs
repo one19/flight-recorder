@@ -3,9 +3,12 @@ import axios from 'axios';
 import { config } from 'dotenv';
 import getDistance from '@riskyvaibhav/lat-long-to-km';
 
+const LOCAL_PATH = import.meta.url.replace('file://', '').replace(/find-flights.mjs/, '');
+
 // load our important environment variables
 // API_KEY, HOME_LAT, HOME_LNG
-config();
+// config()
+config({ path: `${LOCAL_PATH}.env` });
 
 const BOX_VARIANCE = 0.025; // lat/long degrees difference from center(home)
 
@@ -22,15 +25,13 @@ const airLabsApi = axios.create({
   baseURL: 'https://airlabs.co/api/v9',
   transformResponse: (data) => {
     const parsed = JSON.parse(data);
-    console.log(`${parsed.request.key.limits_total} requests remaining`);
+    console.log(`${parsed?.request?.key?.limits_total} requests remaining`);
     return parsed.response;
   }
 });
 
 const logFlyover = async () => {
   const { data: flights } = await airLabsApi.get(`/flights?${searchParams.toString()}`);
-
-  console.log(flights.length);
 
   const likelyFlights = flights
     .filter(flight => flight.alt) // only include flights off the ground
@@ -57,7 +58,7 @@ const logFlyover = async () => {
   // log it to a file so we can see interpret the results later
   // and collate data on busy days & times
   if (likelyFlights.length) {
-    fs.writeFileSync(`./flights/${new Date().toISOString()}.json`, JSON.stringify(likelyFlights, null, 2), 'utf8');
+    fs.writeFileSync(`${LOCAL_PATH}/flights/${new Date().toISOString()}.json`, JSON.stringify(likelyFlights, null, 2), 'utf8');
   }
 }
 
